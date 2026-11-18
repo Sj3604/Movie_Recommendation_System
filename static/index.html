@@ -1,161 +1,85 @@
-const $ = (selector) => document.querySelector(selector);
-const homeGrid = $('#home-grid');
-const suggestions = $('#suggestions');
-const searchInput = $('#search-input');
-const searchButton = $('#search-button');
-let suggestionsTimer;
-let suggestionRequest;
-let searchSerial = 0;
-let toastTimer;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#080b13" />
+  <meta name="description" content="Discover your next favourite film with a content-based movie recommendation engine." />
+  <title>CineMatch — Movie recommendations</title>
+  <link rel="preconnect" href="https://image.tmdb.org" crossorigin />
+  <link rel="stylesheet" href="/static/style.css" />
+  <script src="/static/script.js" defer></script>
+</head>
+<body>
+  <div class="ambient ambient-one" aria-hidden="true"></div>
+  <div class="ambient ambient-two" aria-hidden="true"></div>
+  <header class="site-header">
+    <a href="/" class="brand" aria-label="CineMatch home"><span class="brand-icon">✦</span> CINE<span>MATCH</span></a>
+    <nav aria-label="Main navigation">
+      <a href="#discover" class="nav-link active">Discover</a>
+      <a href="#recommendations" class="nav-link">For you</a>
+      <a href="#about" class="nav-link">How it works</a>
+    </nav>
+    <span class="header-pill"><span class="status-dot"></span> AI-powered discovery</span>
+  </header>
 
-function escapeHTML(value) {
-  return String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
-}
-function movieYear(date) { return /^\d{4}/.test(date ?? '') ? date.slice(0,4) : 'Movie'; }
-function toast(message) {
-  const el = $('#toast');
-  el.textContent = message;
-  el.classList.remove('hidden');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => el.classList.add('hidden'), 5500);
-}
-async function api(path, signal) {
-  const response = await fetch(path, {signal});
-  if (!response.ok) {
-    let message = `Request failed (${response.status})`;
-    try { const data = await response.json(); message = typeof data.detail === 'string' ? data.detail : message; } catch (_) {}
-    throw new Error(message);
-  }
-  return response.json();
-}
-function movieCard(movie, similarity = null) {
-  const title = movie.title || 'Untitled movie';
-  const tmdbId = Number.isInteger(Number(movie.tmdb_id)) ? Number(movie.tmdb_id) : null;
-  const poster = movie.poster_url && movie.poster_url.startsWith('https://image.tmdb.org/')
-    ? `<img src="${escapeHTML(movie.poster_url)}" alt="Poster for ${escapeHTML(title)}" loading="lazy" onerror="this.remove()" />`
-    : `<div class="poster-placeholder">${escapeHTML(title)}</div>`;
-  const rating = movie.vote_average > 0 ? `<span class="poster-rating"><b>★</b> ${Number(movie.vote_average).toFixed(1)}</span>` : '';
-  const score = similarity != null ? ` · ${Math.round(Math.max(0, similarity) * 100)}% similarity` : '';
-  const safeTitle = escapeHTML(title);
-  return `<article class="movie-card" role="button" tabindex="0" data-title="${safeTitle}" ${tmdbId !== null ? `data-tmdb-id="${tmdbId}"` : ''} aria-label="Find recommendations for ${safeTitle}">
-    <div class="poster-wrap">${poster}${rating}</div>
-    <h3 title="${safeTitle}">${safeTitle}</h3><div class="movie-meta">${escapeHTML(movieYear(movie.release_date))}${score}</div>
-  </article>`;
-}
-function bindMovieGrid(grid) {
-  const select = (node) => {
-    const title = node.dataset.title;
-    if (title) chooseMovie(title);
-  };
-  grid.addEventListener('click', e => {
-    const node = e.target.closest('.movie-card');
-    if (node) select(node);
-  });
-  grid.addEventListener('keydown', e => {
-    if (e.key !== 'Enter' && e.key !== ' ') return;
-    const node = e.target.closest('.movie-card');
-    if (node) { e.preventDefault(); select(node); }
-  });
-}
-['#home-grid','#tfidf-grid','#genre-grid'].forEach(selector => bindMovieGrid($(selector)));
+  <main>
+    <section class="hero container" id="discover">
+      <div class="hero-copy">
+        <div class="eyebrow"><span class="eyebrow-line"></span> YOUR PERSONAL MOVIE GUIDE</div>
+        <h1>Great stories.<br /><em>Better discoveries.</em></h1>
+        <p>Tell us a movie you love. Our content-based recommendation engine finds films with similar stories, themes, and genres.</p>
+        <form id="search-form" class="search-shell" autocomplete="off">
+          <div class="search-input-row">
+            <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg>
+            <input id="search-input" type="search" placeholder="Try Interstellar, Inception, Toy Story..." aria-label="Search for a movie" spellcheck="false" required />
+            <button id="search-button" type="submit">Find movies <span aria-hidden="true">↗</span></button>
+          </div>
+          <div class="suggestions hidden" id="suggestions" role="listbox" aria-label="Movie suggestions"></div>
+        </form>
+        <div class="quick-picks"><span>TRY SEARCHING</span><button data-search="Inception">Inception</button><button data-search="The Dark Knight">The Dark Knight</button><button data-search="Titanic">Titanic</button></div>
+      </div>
+      <div class="hero-visual" aria-hidden="true">
+        <div class="visual-halo"></div>
+        <div class="floating-card poster-left"><span>THE NEXT<br />FAVORITE</span><small>✦ DISCOVER</small></div>
+        <div class="floating-card poster-center"><span class="center-star">✳</span><span>YOUR NEXT<br />OBSESSION.</span><small>CURATED FOR YOU</small></div>
+        <div class="floating-card poster-right"><span>ENDLESS<br />STORIES</span><small>PLAY WHAT'S NEXT ↗</small></div>
+        <div class="visual-caption">DISCOVER BEYOND THE ORDINARY <span>✧</span></div>
+      </div>
+    </section>
 
-async function loadHome(category = 'trending') {
-  $('#home-status').textContent = 'Loading movies...';
-  $('#home-status').classList.remove('hidden');
-  homeGrid.innerHTML = '';
-  try {
-    const movies = await api(`/home?category=${encodeURIComponent(category)}&limit=18`);
-    homeGrid.innerHTML = movies.map(m => movieCard(m)).join('');
-    $('#home-status').classList.toggle('hidden', movies.length > 0);
-    if (!movies.length) $('#home-status').textContent = 'No movies available for this category.';
-  } catch (err) {
-    $('#home-status').textContent = `Could not load movies. ${err.message}`;
-  }
-}
-$('.category-tabs').addEventListener('click', e => {
-  const button = e.target.closest('[data-category]');
-  if (!button || button.classList.contains('selected')) return;
-  document.querySelectorAll('.category-tab').forEach(el => {
-    const active = el === button;
-    el.classList.toggle('selected',active);
-    el.setAttribute('aria-selected', String(active));
-  });
-  loadHome(button.dataset.category);
-});
+    <section class="results container hidden" id="recommendations" aria-live="polite">
+      <div class="section-rule"></div>
+      <div id="selected-movie"></div>
+      <div id="tfidf-section" class="recommendation-group hidden">
+        <div class="section-top"><div><div class="section-kicker">01 / SMART PICKS</div><h2>Because you watched <span id="based-on-title">this movie</span></h2><p>Similar movies discovered by your TF-IDF model</p></div><span class="section-accent">✴</span></div>
+        <div class="movie-grid" id="tfidf-grid"></div>
+      </div>
+      <div id="genre-section" class="recommendation-group hidden">
+        <div class="section-top"><div><div class="section-kicker">02 / EXPLORE MORE</div><h2>More from this genre</h2><p>Popular movies with similar genres, powered by TMDB</p></div><span class="section-accent">↗</span></div>
+        <div class="movie-grid" id="genre-grid"></div>
+      </div>
+    </section>
 
-async function loadSuggestions(query) {
-  suggestionRequest?.abort();
-  suggestions.classList.add('hidden');
-  if (query.trim().length < 2) return;
-  suggestionRequest = new AbortController();
-  try {
-    const payload = await api(`/tmdb/search?query=${encodeURIComponent(query)}&page=1`, suggestionRequest.signal);
-    if (searchInput.value.trim() !== query.trim()) return;
-    const movies = (payload.results || []).slice(0, 7);
-    if (!movies.length) return;
-    suggestions.innerHTML = movies.map(m => `<button type="button" class="suggestion" role="option" data-title="${escapeHTML(m.title)}">${escapeHTML(m.title)} <small>${escapeHTML(movieYear(m.release_date))}</small></button>`).join('');
-    suggestions.classList.remove('hidden');
-  } catch (e) { if (e.name !== 'AbortError') suggestions.classList.add('hidden'); }
-}
-searchInput.addEventListener('input', () => {
-  clearTimeout(suggestionsTimer);
-  const query = searchInput.value.trim();
-  suggestionsTimer = setTimeout(() => loadSuggestions(query), 300);
-});
-suggestions.addEventListener('click', e => {
-  const button = e.target.closest('[data-title]');
-  if (button) chooseMovie(button.dataset.title);
-});
-document.addEventListener('click', e => {
-  if (!e.target.closest('.search-shell')) suggestions.classList.add('hidden');
-});
-$('#search-form').addEventListener('submit', e => {
-  e.preventDefault();
-  if (searchInput.value.trim()) chooseMovie(searchInput.value.trim());
-});
-document.querySelectorAll('[data-search]').forEach(button => button.addEventListener('click', () => chooseMovie(button.dataset.search)));
+    <section class="browse container" id="browse">
+      <div class="section-rule"></div>
+      <div class="section-top"><div><div class="section-kicker">THE MOVIE EDIT</div><h2>Explore what's playing</h2><p>Find something worth staying in for.</p></div></div>
+      <div class="category-tabs" role="tablist" aria-label="Movie categories">
+        <button class="category-tab selected" data-category="trending" role="tab" aria-selected="true">✦ Trending</button>
+        <button class="category-tab" data-category="popular" role="tab" aria-selected="false">Popular</button>
+        <button class="category-tab" data-category="top_rated" role="tab" aria-selected="false">Top rated</button>
+        <button class="category-tab" data-category="now_playing" role="tab" aria-selected="false">Now playing</button>
+        <button class="category-tab" data-category="upcoming" role="tab" aria-selected="false">Coming soon</button>
+      </div>
+      <div id="home-status" class="loading-message">Loading movies...</div>
+      <div class="movie-grid" id="home-grid"></div>
+    </section>
 
-function renderSelectedMovie(movie) {
-  const genres = (movie.genres || []).map(g => `<span>${escapeHTML(g.name)}</span>`).join('');
-  const image = movie.poster_url?.startsWith('https://image.tmdb.org/')
-    ? `<img src="${escapeHTML(movie.poster_url)}" alt="${escapeHTML(movie.title)} poster" />`
-    : '<div class="detail-placeholder">NO POSTER</div>';
-  $('#selected-movie').innerHTML = `<div class="selected-film">${image}<div><div class="selected-label">NOW DISCOVERING</div><h2>${escapeHTML(movie.title)}</h2><div class="film-tags"><span>${escapeHTML(movieYear(movie.release_date))}</span>${genres}</div><p>${escapeHTML(movie.overview || 'Explore similar movies with our recommendation engine.')}</p></div></div>`;
-}
-function renderRecommendations(data) {
-  renderSelectedMovie(data.movie_details);
-  $('#based-on-title').textContent = data.movie_details.title;
-  const tfidfItems = data.tfidf_recommendations || [];
-  $('#tfidf-grid').innerHTML = tfidfItems.length ? tfidfItems.map(item => movieCard(item.tmdb || {title:item.title}, item.score)).join('') : '<p class="empty-state">This title is not in the local TF-IDF dataset, so content-based recommendations aren’t available for it. Try Toy Story, Inception, or another movie from the dataset.</p>';
-  $('#genre-grid').innerHTML = (data.genre_recommendations || []).length ? data.genre_recommendations.map(m => movieCard(m)).join('') : '<p class="empty-state">No genre-based suggestions found for this title.</p>';
-  $('#tfidf-section').classList.remove('hidden');
-  $('#genre-section').classList.remove('hidden');
-}
-async function chooseMovie(title) {
-  const serial = ++searchSerial;
-  searchInput.value = title;
-  suggestions.classList.add('hidden');
-  suggestionRequest?.abort();
-  searchButton.disabled = true;
-  searchButton.textContent = 'Finding...';
-  $('#recommendations').classList.remove('hidden');
-  $('#selected-movie').innerHTML = '<div class="loading-message">Finding movies you might love...</div>';
-  $('#tfidf-section').classList.add('hidden');
-  $('#genre-section').classList.add('hidden');
-  $('#recommendations').scrollIntoView({behavior:'smooth', block:'start'});
-  try {
-    const payload = await api(`/movie/search?query=${encodeURIComponent(title)}&tfidf_top_n=12&genre_limit=12`);
-    if (serial !== searchSerial) return;
-    renderRecommendations(payload);
-  } catch (err) {
-    if (serial !== searchSerial) return;
-    $('#selected-movie').innerHTML = `<div class="empty-state">Could not load recommendations: ${escapeHTML(err.message)}. Please try a different movie.</div>`;
-    toast('Unable to load movie recommendations.');
-  } finally {
-    if (serial === searchSerial) {
-      searchButton.disabled = false;
-      searchButton.innerHTML = 'Find movies <span aria-hidden="true">↗</span>';
-    }
-  }
-}
-loadHome();
+    <section class="about container" id="about"><div class="about-symbol">✳</div><div><div class="section-kicker">THE TECH BEHIND THE MAGIC</div><h2>Made for the movies you love.</h2><p>Our recommendation engine uses TF-IDF to compare movie content and identify similar titles from a dataset of 45,447 films. We combine those matches with movie artwork and genre discoveries from The Movie Database.</p></div><span class="about-corner">COSINE SIMILARITY / TF-IDF</span></section>
+  </main>
+
+  <footer><div class="container footer-inner"><span class="brand footer-brand"><span class="brand-icon">✦</span> CINE<span>MATCH</span></span><p>Discover a story worth watching.</p><span>Movie data & artwork from <a href="https://www.themoviedb.org/" target="_blank" rel="noopener noreferrer">TMDB</a>. Not endorsed or certified by TMDB.</span></div></footer>
+
+  <div id="toast" class="toast hidden" role="status"></div>
+</body>
+</html>

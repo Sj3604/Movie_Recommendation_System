@@ -10,18 +10,16 @@ let suggestionsTimer;
 let suggestionRequest;
 let searchSerial = 0;
 let toastTimer;
+let homeSerial = 0;
 
 function escapeHTML(value) {
-    return String(value ?? "").replace(
-        /[&<>"']/g,
-        (ch) => ({
-            "&": "&amp;",
-            "<": "&lt;",
-            ">": "&gt;",
-            '"': "&quot;",
-            "'": "&#39;"
-        }[ch])
-    );
+    return String(value ?? "").replace(/[&<>"']/g, (ch) => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+    }[ch]));
 }
 
 function movieYear(date) {
@@ -30,7 +28,7 @@ function movieYear(date) {
         : "Movie";
 }
 
-function safePosterURL(url) {
+function posterURL(url) {
     if (typeof url !== "string") return null;
 
     try {
@@ -43,7 +41,7 @@ function safePosterURL(url) {
         ) {
             return parsed.href;
         }
-    } catch (error) {
+    } catch {
         return null;
     }
 
@@ -52,7 +50,6 @@ function safePosterURL(url) {
 
 function toast(message) {
     const element = $("#toast");
-
     if (!element) return;
 
     element.textContent = message;
@@ -78,12 +75,11 @@ async function api(path, signal) {
 
         try {
             const data = await response.json();
-
             if (typeof data.detail === "string") {
                 message = data.detail;
             }
-        } catch (error) {
-            // Keep the HTTP error message.
+        } catch {
+            // Use the original HTTP error message.
         }
 
         throw new Error(message);
@@ -95,17 +91,19 @@ async function api(path, signal) {
 function movieCard(movie, similarity = null) {
     const title = movie.title || "Untitled movie";
     const safeTitle = escapeHTML(title);
+    const imageURL = posterURL(movie.poster_url);
 
-    const tmdbId = Number(movie.tmdb_id);
-    const posterURL = safePosterURL(movie.poster_url);
-
-    const poster = posterURL
+    const poster = imageURL
         ? `
             <img
-                src="${escapeHTML(posterURL)}"
+                src="${escapeHTML(imageURL)}"
                 alt="${safeTitle} poster"
                 loading="lazy"
+                onerror="this.style.display='none';this.nextElementSibling.classList.remove('hidden')"
             >
+            <div class="poster-placeholder hidden">
+                ${safeTitle}
+            </div>
         `
         : `
             <div class="poster-placeholder">
@@ -116,13 +114,14 @@ function movieCard(movie, similarity = null) {
     const rating = Number(movie.vote_average) > 0
         ? `
             <span class="poster-rating">
-                <b>★</b> ${Number(movie.vote_average).toFixed(1)}
+                <b>★</b>
+                ${Number(movie.vote_average).toFixed(1)}
             </span>
         `
         : "";
 
-    const score = similarity != null &&
-        Number.isFinite(Number(similarity))
+    const score = similarity !== null &&
+                  Number.isFinite(Number(similarity))
         ? ` · ${Math.round(
             Math.max(0, Math.min(1, Number(similarity))) * 100
         )}% similarity`
@@ -133,11 +132,8 @@ function movieCard(movie, similarity = null) {
             class="movie-card"
             tabindex="0"
             role="button"
-            aria-label="Get recommendations for ${safeTitle}"
             data-title="${safeTitle}"
-            ${Number.isInteger(tmdbId) && tmdbId > 0
-                ? `data-id="${tmdbId}"`
-                : ""}
+            aria-label="Find movies similar to ${safeTitle}"
         >
             <div class="poster-wrap">
                 ${poster}
@@ -159,13 +155,13 @@ function movieCard(movie, similarity = null) {
 function bindMovieGrid(grid) {
     if (!grid) return;
 
-    function selectMovie(node) {
+    const selectMovie = (node) => {
         const title = node.dataset.title;
 
         if (title) {
             chooseMovie(title);
         }
-    }
+    };
 
     grid.addEventListener("click", (event) => {
         const node = event.target.closest(".movie-card");
@@ -176,10 +172,7 @@ function bindMovieGrid(grid) {
     });
 
     grid.addEventListener("keydown", (event) => {
-        if (
-            event.key !== "Enter" &&
-            event.key !== " "
-        ) {
+        if (event.key !== "Enter" && event.key !== " ") {
             return;
         }
 
@@ -201,17 +194,21 @@ function bindMovieGrid(grid) {
 });
 
 async function loadHome(category = "trending") {
+    const serial = ++homeSerial;
     const status = $("#home-status");
+
+    if (!homeGrid || !status) return;
 
     status.textContent = "Loading movies...";
     status.classList.remove("hidden");
-
     homeGrid.innerHTML = "";
 
     try {
         const movies = await api(
             `/home?category=${encodeURIComponent(category)}&limit=18`
         );
+
+        if (serial !== homeSerial) return;
 
         homeGrid.innerHTML = movies
             .map((movie) => movieCard(movie))
@@ -225,6 +222,8 @@ async function loadHome(category = "trending") {
         }
 
     } catch (error) {
+        if (serial !== homeSerial) return;
+
         console.error("Home loading error:", error);
 
         status.textContent =
@@ -251,11 +250,7 @@ if (categoryTabs) {
             .forEach((element) => {
                 const active = element === button;
 
-                element.classList.toggle(
-                    "selected",
-                    active
-                );
-
+                element.classList.toggle("selected", active);
                 element.setAttribute(
                     "aria-selected",
                     String(active)
@@ -269,6 +264,8 @@ if (categoryTabs) {
 async function loadSuggestions(query) {
     suggestionRequest?.abort();
 
+    if (!suggestions) return;
+
     suggestions.classList.add("hidden");
 
     if (query.trim().length < 2) {
@@ -277,7 +274,6 @@ async function loadSuggestions(query) {
     }
 
     const controller = new AbortController();
-
     suggestionRequest = controller;
 
     try {
@@ -293,73 +289,74 @@ async function loadSuggestions(query) {
             return;
         }
 
-        const movies = (payload.results || [])
-            .slice(0, 7);
+        const movies = (payload.results || []).slice(0, 7);
 
         if (!movies.length) {
             suggestions.innerHTML = "";
             return;
         }
 
-        suggestions.innerHTML = movies
-            .map((movie) => {
-                const title = movie.title || "Untitled movie";
-                const safeTitle = escapeHTML(title);
+        suggestions.innerHTML = movies.map((movie) => {
+            const title = movie.title || "Untitled movie";
+            const safeTitle = escapeHTML(title);
 
-                return `
-                    <button
-                        type="button"
-                        class="suggestion"
-                        data-title="${safeTitle}"
-                    >
-                        ${safeTitle}
-                        <small>
-                            ${escapeHTML(movieYear(movie.release_date))}
-                        </small>
-                    </button>
-                `;
-            })
-            .join("");
+            return `
+                <button
+                    type="button"
+                    class="suggestion"
+                    data-title="${safeTitle}"
+                >
+                    ${safeTitle}
+                    <small>
+                        ${escapeHTML(movieYear(movie.release_date))}
+                    </small>
+                </button>
+            `;
+        }).join("");
 
         suggestions.classList.remove("hidden");
 
     } catch (error) {
         if (error.name !== "AbortError") {
-            console.error("Suggestion error:", error);
+            console.error("Suggestions error:", error);
             suggestions.classList.add("hidden");
         }
     }
 }
 
-searchInput.addEventListener("input", () => {
-    clearTimeout(suggestionsTimer);
+if (searchInput) {
+    searchInput.addEventListener("input", () => {
+        clearTimeout(suggestionsTimer);
+        suggestionRequest?.abort();
 
-    suggestionRequest?.abort();
-    suggestions.classList.add("hidden");
+        suggestions?.classList.add("hidden");
 
-    const query = searchInput.value.trim();
+        const query = searchInput.value.trim();
 
-    if (query.length < 2) {
-        suggestions.innerHTML = "";
-        return;
-    }
+        if (query.length < 2) {
+            if (suggestions) suggestions.innerHTML = "";
+            return;
+        }
 
-    suggestionsTimer = setTimeout(() => {
-        loadSuggestions(query);
-    }, 300);
-});
+        suggestionsTimer = setTimeout(() => {
+            loadSuggestions(query);
+        }, 300);
+    });
+}
 
-suggestions.addEventListener("click", (event) => {
-    const button = event.target.closest("[data-title]");
+if (suggestions) {
+    suggestions.addEventListener("click", (event) => {
+        const button = event.target.closest("[data-title]");
 
-    if (button) {
-        chooseMovie(button.dataset.title);
-    }
-});
+        if (button) {
+            chooseMovie(button.dataset.title);
+        }
+    });
+}
 
 document.addEventListener("click", (event) => {
     if (!event.target.closest(".search-shell")) {
-        suggestions.classList.add("hidden");
+        suggestions?.classList.add("hidden");
     }
 });
 
@@ -385,26 +382,24 @@ document.querySelectorAll("[data-search]")
     });
 
 function renderSelectedMovie(movie) {
-    const title = escapeHTML(movie.title);
-    const posterURL = safePosterURL(movie.poster_url);
+    const safeTitle = escapeHTML(movie.title);
+    const imageURL = posterURL(movie.poster_url);
 
-    const genres = (movie.genres || [])
-        .map((genre) => {
-            return `
-                <span>
-                    ${escapeHTML(genre.name)}
-                </span>
-            `;
-        })
-        .join("");
+    const genres = (movie.genres || []).map((genre) => `
+        <span>${escapeHTML(genre.name)}</span>
+    `).join("");
 
-    const image = posterURL
+    const image = imageURL
         ? `
             <img
-                src="${escapeHTML(posterURL)}"
-                alt="${title} poster"
+                src="${escapeHTML(imageURL)}"
+                alt="${safeTitle} poster"
                 loading="lazy"
+                onerror="this.style.display='none';this.nextElementSibling.classList.remove('hidden')"
             >
+            <div class="detail-placeholder hidden">
+                NO POSTER
+            </div>
         `
         : `
             <div class="detail-placeholder">
@@ -421,13 +416,12 @@ function renderSelectedMovie(movie) {
                     NOW DISCOVERING
                 </div>
 
-                <h2>${title}</h2>
+                <h2>${safeTitle}</h2>
 
                 <div class="film-tags">
                     <span>
                         ${escapeHTML(movieYear(movie.release_date))}
                     </span>
-
                     ${genres}
                 </div>
 
@@ -448,61 +442,48 @@ function renderRecommendations(data) {
     $("#based-on-title").textContent =
         data.movie_details.title;
 
-    const tfidfItems =
-        data.tfidf_recommendations || [];
+    const tfidfItems = data.tfidf_recommendations || [];
 
-    const tfidfGrid = $("#tfidf-grid");
+    $("#tfidf-grid").innerHTML = tfidfItems.length
+        ? tfidfItems.map((item) => {
+            const movie = item.tmdb || {
+                title: item.title
+            };
 
-    if (tfidfItems.length > 0) {
-        tfidfGrid.innerHTML = tfidfItems
-            .map((item) => {
-                const movie = item.tmdb || {
-                    title: item.title
-                };
-
-                return movieCard(movie, item.score);
-            })
-            .join("");
-    } else {
-        tfidfGrid.innerHTML = `
+            return movieCard(movie, item.score);
+        }).join("")
+        : `
             <div class="empty-state">
                 This title is not in the local TF-IDF dataset,
-                so content-based recommendations are not available
-                for it.
+                so content-based recommendations are not
+                available for it.
 
                 Try Toy Story, Inception, or another movie
                 from the dataset.
             </div>
         `;
-    }
 
-    const genreItems =
-        data.genre_recommendations || [];
+    const genreItems = data.genre_recommendations || [];
 
-    const genreGrid = $("#genre-grid");
-
-    if (genreItems.length > 0) {
-        genreGrid.innerHTML = genreItems
-            .map((movie) => movieCard(movie))
-            .join("");
-    } else {
-        genreGrid.innerHTML = `
+    $("#genre-grid").innerHTML = genreItems.length
+        ? genreItems.map((movie) => movieCard(movie)).join("")
+        : `
             <div class="empty-state">
                 No genre-based suggestions found for this title.
             </div>
         `;
-    }
 
     $("#tfidf-section").classList.remove("hidden");
     $("#genre-section").classList.remove("hidden");
 }
 
 async function chooseMovie(title) {
+    if (!title || !title.trim()) return;
+
     const serial = ++searchSerial;
 
     searchInput.value = title;
-
-    suggestions.classList.add("hidden");
+    suggestions?.classList.add("hidden");
 
     clearTimeout(suggestionsTimer);
     suggestionRequest?.abort();
@@ -533,16 +514,12 @@ async function chooseMovie(title) {
             `/movie/search?query=${encodeURIComponent(title)}&tfidf_top_n=12&genre_limit=12`
         );
 
-        if (serial !== searchSerial) {
-            return;
-        }
+        if (serial !== searchSerial) return;
 
         renderRecommendations(payload);
 
     } catch (error) {
-        if (serial !== searchSerial) {
-            return;
-        }
+        if (serial !== searchSerial) return;
 
         console.error("Recommendation error:", error);
 
