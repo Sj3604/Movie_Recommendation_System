@@ -1,7 +1,161 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap');
-:root{--bg:#080b13;--panel:#111622;--muted:#9ca5b6;--text:#f5f6fb;--line:#272d3c;--accent:#d9fd6d;--accent2:#92a7ff;--radius:18px}
-*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-width:320px;overflow-x:hidden}button,input{font:inherit}button{cursor:pointer}button:disabled{opacity:.65;cursor:not-allowed}a{color:inherit;text-decoration:none}.container{width:min(1280px,calc(100% - 96px));margin:auto}.hidden{display:none!important}.ambient{pointer-events:none;position:absolute;filter:blur(110px);border-radius:50%;z-index:-1}.ambient-one{width:430px;height:430px;right:-140px;top:40px;background:#3d3d7d55}.ambient-two{width:410px;height:410px;left:-240px;top:490px;background:#54784926}.site-header{height:92px;width:min(1380px,calc(100% - 90px));margin:auto;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #ffffff13;gap:22px}.brand{white-space:nowrap;font-family:Manrope,sans-serif;font-weight:800;letter-spacing:-1.1px;font-size:22px}.brand span:last-child{color:var(--accent)}.brand-icon{display:inline-flex;align-items:center;justify-content:center;color:#0a0d0d;background:var(--accent);width:33px;height:33px;border-radius:10px;letter-spacing:0;font-size:22px;margin-right:7px}.site-header nav{display:flex;gap:35px}.nav-link{font-size:13px;color:#a9b0c0;transition:color .2s}.nav-link:hover,.nav-link.active{color:#fff}.header-pill{font-size:11px;letter-spacing:.3px;color:#dee7c5;background:#cfff6320;border:1px solid #d2fc6130;border-radius:30px;padding:10px 14px;white-space:nowrap}.status-dot{display:inline-block;background:var(--accent);width:6px;height:6px;border-radius:50%;margin-right:7px;box-shadow:0 0 10px var(--accent)}.hero{min-height:610px;display:grid;grid-template-columns:1fr 1fr;align-items:center;gap:32px;padding-top:35px;padding-bottom:55px}.hero-copy{z-index:2}.eyebrow,.section-kicker{font-weight:700;font-size:10px;letter-spacing:2.5px;color:var(--accent)}.eyebrow{display:flex;align-items:center;gap:10px}.eyebrow-line{background:var(--accent);height:1px;width:30px}.hero h1{font-family:Manrope,sans-serif;font-size:clamp(40px,4.5vw,73px);line-height:1.13;letter-spacing:-3.6px;font-weight:800;margin:22px 0 22px}.hero h1 em{font-style:normal;color:var(--accent)}.hero-copy>p{color:var(--muted);font-size:15px;line-height:1.9;max-width:490px;margin:0 0 32px}.search-shell{position:relative;max-width:615px}.search-input-row{display:flex;align-items:center;background:#171c29;border:1px solid #3b4556;border-radius:14px;padding:6px 6px 6px 17px;box-shadow:0 17px 50px #0004;transition:border .2s}.search-input-row:focus-within{border-color:#b6e45d}.search-icon{width:19px;height:19px;flex-shrink:0;color:#a1a9ba}.search-input-row input{min-width:0;flex:1;border:0;outline:none;background:transparent;color:#fff;padding:12px 10px;font-size:13px}.search-input-row input::placeholder{color:#8f98aa}.search-input-row input::-webkit-search-cancel-button{filter:invert(1)}.search-input-row>button{border:0;background:var(--accent);border-radius:9px;padding:14px 17px;color:#182008;font-weight:800;white-space:nowrap;font-size:12px}.search-input-row>button span{margin-left:12px}.suggestions{position:absolute;z-index:30;top:calc(100% + 7px);left:0;right:0;background:#171d2b;border:1px solid #394253;border-radius:12px;padding:7px;box-shadow:0 18px 45px #000b;max-height:320px;overflow-y:auto}.suggestion{display:block;padding:11px 13px;width:100%;background:transparent;border:0;color:#f2f4fa;text-align:left;border-radius:8px;font-size:13px}.suggestion:hover,.suggestion:focus{background:#30384b}.suggestion small{color:#a3aabe;margin-left:8px}.quick-picks{margin-top:21px;display:flex;flex-wrap:wrap;gap:8px;align-items:center}.quick-picks>span{font-size:9px;font-weight:800;letter-spacing:1.5px;color:#727b8e;margin-right:7px}.quick-picks button{background:#151b27;border:1px solid #2c3445;border-radius:20px;color:#bbc3d1;padding:8px 11px;font-size:11px}.quick-picks button:hover{border-color:var(--accent);color:#fff}.hero-visual{height:470px;position:relative;display:flex;align-items:center;justify-content:center;isolation:isolate}.visual-halo{position:absolute;width:430px;height:430px;max-width:100%;border-radius:50%;border:1px solid #b4c89a25;background:radial-gradient(circle,#a8be9630,transparent 65%);box-shadow:0 0 0 65px #d8e0aa04;transform:rotate(-20deg)}.floating-card{position:absolute;width:203px;height:304px;padding:25px 18px;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 20px 70px #000a;overflow:hidden;border:1px solid #ffffff30}.floating-card>span:not(.center-star){font-family:Manrope,sans-serif;font-size:23px;font-weight:800;letter-spacing:-.9px;line-height:1.14}.floating-card small{font-size:9px;font-weight:800;letter-spacing:1.5px}.poster-left{transform:translate(-132px,11px) rotate(-18deg);background:linear-gradient(140deg,#ad94a3,#3a4d64 60%,#121e30);border-radius:8px}.poster-left:after{content:'✦';position:absolute;color:#ffffff44;font-size:170px;top:60px;left:50px}.poster-center{z-index:2;transform:translateY(-15px) rotate(-1deg);height:350px;width:235px;background:radial-gradient(circle at 45% 34%,#b1df68,#536e48 48%,#1d2f2a);border-radius:8px;color:#fff}.poster-center:after{content:'';height:160px;width:160px;position:absolute;left:38px;top:70px;border:2px solid #e8ffca5c;border-radius:50%;box-shadow:0 0 0 15px #ffffff0d,0 0 0 40px #ffffff08}.poster-center .center-star{position:absolute;top:93px;left:91px;font-size:95px;z-index:1;color:#efffc9}.poster-center>span:not(.center-star){z-index:2;margin-top:auto;margin-bottom:15px}.poster-center small{z-index:2}.poster-right{transform:translate(139px,18px) rotate(17deg);background:linear-gradient(155deg,#b26c61,#58394e 60%,#242641);border-radius:8px}.poster-right:after{content:'◒';font-size:200px;position:absolute;top:45px;color:#ffbd954f}.visual-caption{position:absolute;bottom:0;right:20px;font-size:9px;letter-spacing:2.3px;color:#a4abbd}.visual-caption span{color:var(--accent);font-size:21px;margin-left:12px}.section-rule{height:1px;background:linear-gradient(90deg,#30394a,transparent);margin:25px 0 43px}.section-top{display:flex;align-items:flex-start;justify-content:space-between;margin:0 0 26px;gap:20px}.section-top h2,.about h2{font-family:Manrope,sans-serif;font-size:clamp(24px,2.65vw,35px);letter-spacing:-1.2px;margin:11px 0 8px}.section-top h2 span{color:var(--accent)}.section-top p{color:#8e98aa;font-size:13px;margin:0}.section-accent{font-size:35px;color:var(--accent)}.browse{padding-bottom:76px}.category-tabs{display:flex;gap:8px;overflow:auto;padding:0 0 20px;scrollbar-width:thin}.category-tab{white-space:nowrap;border:1px solid #313848;background:#121824;color:#a5adbb;border-radius:9px;font-size:12px;font-weight:700;padding:12px 18px}.category-tab.selected{background:var(--accent);border-color:var(--accent);color:#1b220d}.movie-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:24px 17px}.movie-card{min-width:0;cursor:pointer;outline:none}.poster-wrap{position:relative;aspect-ratio:2/3;background:linear-gradient(145deg,#263345,#17202d);border-radius:12px;overflow:hidden;border:1px solid #ffffff13;transition:transform .2s,box-shadow .2s}.movie-card:hover .poster-wrap,.movie-card:focus-visible .poster-wrap{transform:translateY(-5px);box-shadow:0 15px 30px #0008}.poster-wrap img{width:100%;height:100%;object-fit:cover;display:block}.poster-placeholder{display:flex;align-items:center;justify-content:center;height:100%;padding:14px;text-align:center;color:#b8c3d7;font-size:13px;font-weight:700;background:linear-gradient(135deg,#34425a,#151c2a)}.poster-rating{position:absolute;bottom:9px;right:9px;background:#080d13dd;backdrop-filter:blur(6px);border:1px solid #ffffff27;border-radius:6px;font-size:10px;padding:6px 8px;color:#f9f6da}.poster-rating b{color:#f8dd6b}.movie-card h3{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin:12px 0 5px;font-weight:700}.movie-meta{color:#8993a5;font-size:11px}.loading-message{padding:38px 14px;text-align:center;color:#a4aebf;font-size:13px}.recommendation-group{margin:0 0 64px}.results{scroll-margin-top:15px}.selected-film{display:grid;grid-template-columns:180px 1fr;gap:35px;align-items:center;margin:0 0 54px;background:linear-gradient(110deg,#192333,#10151f);border:1px solid #303b48;border-radius:20px;padding:24px}.selected-film img,.selected-film .detail-placeholder{width:180px;aspect-ratio:2/3;object-fit:cover;border-radius:10px;background:#1d283b}.selected-film .detail-placeholder{display:flex;align-items:center;justify-content:center;color:#8fa2af}.selected-film h2{font-family:Manrope,sans-serif;letter-spacing:-1px;font-size:clamp(25px,3vw,40px);margin:10px 0 12px}.selected-film p{color:#b4bdcb;line-height:1.85;font-size:13px;max-width:720px}.film-tags{display:flex;flex-wrap:wrap;gap:8px}.film-tags span{font-size:11px;background:#303d4a;border:1px solid #44505d;color:#dae3ed;padding:7px 12px;border-radius:20px}.selected-label{color:var(--accent);font-size:10px;font-weight:800;letter-spacing:2px}.empty-state{color:#9eacba;font-size:13px;line-height:1.7;grid-column:1/-1;padding:20px 0}.about{background:linear-gradient(105deg,#1d2a29,#121b21 75%);border:1px solid #35433a;border-radius:22px;padding:42px;display:flex;align-items:center;gap:35px;margin-bottom:70px}.about-symbol{color:var(--accent);font-size:65px}.about h2{margin:8px 0 10px}.about p{line-height:1.8;color:#a9b7b4;max-width:760px;font-size:13px;margin:0}.about-corner{margin-left:auto;color:#b5ce91;letter-spacing:1.7px;font-size:9px;white-space:nowrap}footer{background:#0b0f17;border-top:1px solid #262e39;padding:32px 0}.footer-inner{display:flex;align-items:center;justify-content:space-between;gap:25px}.footer-inner p,.footer-inner>span:last-child{font-size:11px;color:#8791a1}.footer-inner a{color:#d5ed9b;text-decoration:underline}.footer-brand{font-size:16px}.footer-brand .brand-icon{width:26px;height:26px;font-size:18px}.toast{position:fixed;z-index:100;right:24px;bottom:24px;max-width:430px;background:#272f40;color:#fff;box-shadow:0 15px 50px #000b;border:1px solid #626d82;border-radius:12px;padding:16px 20px;font-size:13px;line-height:1.5}
-@media(max-width:1100px){.movie-grid{grid-template-columns:repeat(4,minmax(0,1fr))}.hero{grid-template-columns:1.15fr .85fr}.hero-visual{transform:scale(.78)}.about-corner{display:none}}
-@media(max-width:760px){.container{width:calc(100% - 36px)}.site-header{width:calc(100% - 36px);height:75px}.site-header nav,.header-pill{display:none}.hero{grid-template-columns:1fr;min-height:0;padding-top:58px;padding-bottom:38px}.hero h1{font-size:clamp(39px,9vw,63px);letter-spacing:-2.1px}.hero-visual{height:315px;transform:scale(.66);margin:-50px 0 -30px}.movie-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:21px 12px}.selected-film{grid-template-columns:110px 1fr;padding:15px;gap:15px}.selected-film img,.selected-film .detail-placeholder{width:110px}.selected-film p{font-size:11px;line-height:1.6}.selected-film h2{font-size:22px}.film-tags span{font-size:9px;padding:5px 7px}.about{padding:24px;gap:15px}.about-symbol{font-size:42px}.footer-inner{flex-wrap:wrap}.search-input-row>button{padding:13px 12px}.search-input-row>button span{display:none}}
-@media(max-width:440px){.movie-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.hero-visual{margin:-55px 0 -55px;transform:scale(.53)}.selected-film{grid-template-columns:90px 1fr}.selected-film img,.selected-film .detail-placeholder{width:90px}.search-input-row input{font-size:12px}.search-input-row>button{font-size:11px}.about-symbol{display:none}}
-@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+const $ = (selector) => document.querySelector(selector);
+const homeGrid = $('#home-grid');
+const suggestions = $('#suggestions');
+const searchInput = $('#search-input');
+const searchButton = $('#search-button');
+let suggestionsTimer;
+let suggestionRequest;
+let searchSerial = 0;
+let toastTimer;
+
+function escapeHTML(value) {
+  return String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+}
+function movieYear(date) { return /^\d{4}/.test(date ?? '') ? date.slice(0,4) : 'Movie'; }
+function toast(message) {
+  const el = $('#toast');
+  el.textContent = message;
+  el.classList.remove('hidden');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.add('hidden'), 5500);
+}
+async function api(path, signal) {
+  const response = await fetch(path, {signal});
+  if (!response.ok) {
+    let message = `Request failed (${response.status})`;
+    try { const data = await response.json(); message = typeof data.detail === 'string' ? data.detail : message; } catch (_) {}
+    throw new Error(message);
+  }
+  return response.json();
+}
+function movieCard(movie, similarity = null) {
+  const title = movie.title || 'Untitled movie';
+  const tmdbId = Number.isInteger(Number(movie.tmdb_id)) ? Number(movie.tmdb_id) : null;
+  const poster = movie.poster_url && movie.poster_url.startsWith('https://image.tmdb.org/')
+    ? `<img src="${escapeHTML(movie.poster_url)}" alt="Poster for ${escapeHTML(title)}" loading="lazy" onerror="this.remove()" />`
+    : `<div class="poster-placeholder">${escapeHTML(title)}</div>`;
+  const rating = movie.vote_average > 0 ? `<span class="poster-rating"><b>★</b> ${Number(movie.vote_average).toFixed(1)}</span>` : '';
+  const score = similarity != null ? ` · ${Math.round(Math.max(0, similarity) * 100)}% similarity` : '';
+  const safeTitle = escapeHTML(title);
+  return `<article class="movie-card" role="button" tabindex="0" data-title="${safeTitle}" ${tmdbId !== null ? `data-tmdb-id="${tmdbId}"` : ''} aria-label="Find recommendations for ${safeTitle}">
+    <div class="poster-wrap">${poster}${rating}</div>
+    <h3 title="${safeTitle}">${safeTitle}</h3><div class="movie-meta">${escapeHTML(movieYear(movie.release_date))}${score}</div>
+  </article>`;
+}
+function bindMovieGrid(grid) {
+  const select = (node) => {
+    const title = node.dataset.title;
+    if (title) chooseMovie(title);
+  };
+  grid.addEventListener('click', e => {
+    const node = e.target.closest('.movie-card');
+    if (node) select(node);
+  });
+  grid.addEventListener('keydown', e => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    const node = e.target.closest('.movie-card');
+    if (node) { e.preventDefault(); select(node); }
+  });
+}
+['#home-grid','#tfidf-grid','#genre-grid'].forEach(selector => bindMovieGrid($(selector)));
+
+async function loadHome(category = 'trending') {
+  $('#home-status').textContent = 'Loading movies...';
+  $('#home-status').classList.remove('hidden');
+  homeGrid.innerHTML = '';
+  try {
+    const movies = await api(`/home?category=${encodeURIComponent(category)}&limit=18`);
+    homeGrid.innerHTML = movies.map(m => movieCard(m)).join('');
+    $('#home-status').classList.toggle('hidden', movies.length > 0);
+    if (!movies.length) $('#home-status').textContent = 'No movies available for this category.';
+  } catch (err) {
+    $('#home-status').textContent = `Could not load movies. ${err.message}`;
+  }
+}
+$('.category-tabs').addEventListener('click', e => {
+  const button = e.target.closest('[data-category]');
+  if (!button || button.classList.contains('selected')) return;
+  document.querySelectorAll('.category-tab').forEach(el => {
+    const active = el === button;
+    el.classList.toggle('selected',active);
+    el.setAttribute('aria-selected', String(active));
+  });
+  loadHome(button.dataset.category);
+});
+
+async function loadSuggestions(query) {
+  suggestionRequest?.abort();
+  suggestions.classList.add('hidden');
+  if (query.trim().length < 2) return;
+  suggestionRequest = new AbortController();
+  try {
+    const payload = await api(`/tmdb/search?query=${encodeURIComponent(query)}&page=1`, suggestionRequest.signal);
+    if (searchInput.value.trim() !== query.trim()) return;
+    const movies = (payload.results || []).slice(0, 7);
+    if (!movies.length) return;
+    suggestions.innerHTML = movies.map(m => `<button type="button" class="suggestion" role="option" data-title="${escapeHTML(m.title)}">${escapeHTML(m.title)} <small>${escapeHTML(movieYear(m.release_date))}</small></button>`).join('');
+    suggestions.classList.remove('hidden');
+  } catch (e) { if (e.name !== 'AbortError') suggestions.classList.add('hidden'); }
+}
+searchInput.addEventListener('input', () => {
+  clearTimeout(suggestionsTimer);
+  const query = searchInput.value.trim();
+  suggestionsTimer = setTimeout(() => loadSuggestions(query), 300);
+});
+suggestions.addEventListener('click', e => {
+  const button = e.target.closest('[data-title]');
+  if (button) chooseMovie(button.dataset.title);
+});
+document.addEventListener('click', e => {
+  if (!e.target.closest('.search-shell')) suggestions.classList.add('hidden');
+});
+$('#search-form').addEventListener('submit', e => {
+  e.preventDefault();
+  if (searchInput.value.trim()) chooseMovie(searchInput.value.trim());
+});
+document.querySelectorAll('[data-search]').forEach(button => button.addEventListener('click', () => chooseMovie(button.dataset.search)));
+
+function renderSelectedMovie(movie) {
+  const genres = (movie.genres || []).map(g => `<span>${escapeHTML(g.name)}</span>`).join('');
+  const image = movie.poster_url?.startsWith('https://image.tmdb.org/')
+    ? `<img src="${escapeHTML(movie.poster_url)}" alt="${escapeHTML(movie.title)} poster" />`
+    : '<div class="detail-placeholder">NO POSTER</div>';
+  $('#selected-movie').innerHTML = `<div class="selected-film">${image}<div><div class="selected-label">NOW DISCOVERING</div><h2>${escapeHTML(movie.title)}</h2><div class="film-tags"><span>${escapeHTML(movieYear(movie.release_date))}</span>${genres}</div><p>${escapeHTML(movie.overview || 'Explore similar movies with our recommendation engine.')}</p></div></div>`;
+}
+function renderRecommendations(data) {
+  renderSelectedMovie(data.movie_details);
+  $('#based-on-title').textContent = data.movie_details.title;
+  const tfidfItems = data.tfidf_recommendations || [];
+  $('#tfidf-grid').innerHTML = tfidfItems.length ? tfidfItems.map(item => movieCard(item.tmdb || {title:item.title}, item.score)).join('') : '<p class="empty-state">This title is not in the local TF-IDF dataset, so content-based recommendations aren’t available for it. Try Toy Story, Inception, or another movie from the dataset.</p>';
+  $('#genre-grid').innerHTML = (data.genre_recommendations || []).length ? data.genre_recommendations.map(m => movieCard(m)).join('') : '<p class="empty-state">No genre-based suggestions found for this title.</p>';
+  $('#tfidf-section').classList.remove('hidden');
+  $('#genre-section').classList.remove('hidden');
+}
+async function chooseMovie(title) {
+  const serial = ++searchSerial;
+  searchInput.value = title;
+  suggestions.classList.add('hidden');
+  suggestionRequest?.abort();
+  searchButton.disabled = true;
+  searchButton.textContent = 'Finding...';
+  $('#recommendations').classList.remove('hidden');
+  $('#selected-movie').innerHTML = '<div class="loading-message">Finding movies you might love...</div>';
+  $('#tfidf-section').classList.add('hidden');
+  $('#genre-section').classList.add('hidden');
+  $('#recommendations').scrollIntoView({behavior:'smooth', block:'start'});
+  try {
+    const payload = await api(`/movie/search?query=${encodeURIComponent(title)}&tfidf_top_n=12&genre_limit=12`);
+    if (serial !== searchSerial) return;
+    renderRecommendations(payload);
+  } catch (err) {
+    if (serial !== searchSerial) return;
+    $('#selected-movie').innerHTML = `<div class="empty-state">Could not load recommendations: ${escapeHTML(err.message)}. Please try a different movie.</div>`;
+    toast('Unable to load movie recommendations.');
+  } finally {
+    if (serial === searchSerial) {
+      searchButton.disabled = false;
+      searchButton.innerHTML = 'Find movies <span aria-hidden="true">↗</span>';
+    }
+  }
+}
+loadHome();
